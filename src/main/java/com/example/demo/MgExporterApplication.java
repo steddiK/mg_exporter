@@ -17,8 +17,7 @@ public class MgExporterApplication {
 	public CommandLineRunner run(LogReaderService logReaderService) {
 		return args -> {
 
-
-			String logFilePath = "D:/Utilisateurs/steddi.andritiana/Stage/localhost_access_log.log";
+			String logFilePath = "D:/Utilisateurs/steddi.andritiana/Desktop/Letgo/myapplication.log";
 			logReaderService.watchAndProcessErrorLogs(logFilePath);
 		};
 	}

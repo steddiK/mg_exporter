@@ -20,7 +20,7 @@ public class LogReaderService {
     private final Counter Erreur403;
     private final Counter Erreur404;
     private final Counter Erreur500;
-    private List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
+    private final List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
 
     public LogReaderService(PrometheusMeterRegistry registry) {
         this.Erreur400 = Counter.builder("error_http_400")
@@ -75,6 +75,11 @@ public class LogReaderService {
 
         System.out.println("En attente de modifications dans le fichier de logs...");
 
+        try {
+            Thread.sleep(2000); // Attendre 2 secondes (ajustez si nécessaire)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // À un moment donné, lorsque vous souhaitez arrêter la surveillance (par exemple, lorsque votre application se termine),
         // appelez la méthode stop de Tailer :
         // tailer.stop();
