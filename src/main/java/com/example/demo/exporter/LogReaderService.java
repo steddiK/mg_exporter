@@ -21,7 +21,6 @@ public class LogReaderService {
     private final Counter Erreur404;
     private final Counter Erreur500;
     private List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
-    private int cpt=0;
 
     public LogReaderService(PrometheusMeterRegistry registry) {
         this.Erreur400 = Counter.builder("error_http_400")
@@ -93,7 +92,7 @@ public class LogReaderService {
         }
         if(errorStatus.equals(" 401 ")){
             this.Erreur401.increment();
-            System.out.println("Error Log Line: " + errorLogLine);
+            System.out.println("Erreur detecté: " + errorLogLine);
         }
         if(errorStatus.equals(" 400 ")){
             this.Erreur400.increment();
