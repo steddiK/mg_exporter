@@ -16,9 +16,10 @@ public class MgExporterApplication {
 	@Bean
 	public CommandLineRunner run(LogReaderService logReaderService) {
 		return args -> {
-			// Remplacez "/chemin/vers/votre/fichier.log" par le chemin réel vers le fichier de logs
+
+
 			String logFilePath = "D:/Utilisateurs/steddi.andritiana/Stage/localhost_access_log.log";
-			logReaderService.readAndProcessLogs(logFilePath);
+			logReaderService.watchAndProcessErrorLogs(logFilePath);
 		};
 	}
 
