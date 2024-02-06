@@ -2,7 +2,6 @@ package com.example.demo.exporter;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
@@ -20,7 +19,7 @@ public class LogReaderService {
     private final Counter Erreur403;
     private final Counter Erreur404;
     private final Counter Erreur500;
-    private List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
+    private final List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
 
     public LogReaderService(PrometheusMeterRegistry registry) {
         this.Erreur400 = Counter.builder("error_http_400")
@@ -45,43 +44,43 @@ public class LogReaderService {
             List<String> logLines = FileUtils.readLines(new File(logFilePath), StandardCharsets.UTF_8);
 
             for (String logLine : logLines) {
-                for (int i=0; i<typeError.size();i++){
-                    if (containsError(logLine,typeError.get(i))) {
-                        processErrorLog(logLine, typeError.get(i));
+                for (String s : typeError) {
+                    if (containsError(logLine, s)) {
+                        processErrorLog(logLine, s);
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Gérer l'exception selon les besoins
         }
     }
     public void watchAndProcessErrorLogs(String logFilePath) {
+        //recupere les erreur déja dans le fichier log.
         readAndProcessErrorLogs(logFilePath);
 
         File logFile = new File(logFilePath);
         TailerListenerAdapter listener = new TailerListenerAdapter() {
             @Override
             public void handle(String line) {
-                for (int i=0; i<typeError.size();i++){
-                    if (containsError(line,typeError.get(i))) {
-                        processErrorLog(line, typeError.get(i));
+                for (String s : typeError) {
+                    if (containsError(line, s)) {
+                        processErrorLog(line, s);
                     }
                 }
             }
         };
 
         Tailer tailer = Tailer.create(logFile, listener, 1000, true);
-
         System.out.println("En attente de modifications dans le fichier de logs...");
 
-        // À un moment donné, lorsque vous souhaitez arrêter la surveillance (par exemple, lorsque votre application se termine),
-        // appelez la méthode stop de Tailer :
-        // tailer.stop();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean containsError(String logLine, String errorStatus) {
-        // Logique pour vérifier si la ligne contient une erreur
         return logLine.toLowerCase().contains(errorStatus);
     }
 
@@ -103,8 +102,5 @@ public class LogReaderService {
         if(errorStatus.equals(" 500 ")){
             this.Erreur500.increment();
         }
-
     }
 }
-
-
