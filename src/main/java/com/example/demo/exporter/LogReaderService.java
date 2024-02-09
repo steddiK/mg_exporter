@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class LogReaderService {
+    //les metriques sont de type counter
     private final Counter Erreur400;
     private final Counter Erreur401;
     private final Counter Erreur403;
@@ -22,6 +23,7 @@ public class LogReaderService {
     private final List<String> typeError= Arrays.asList(" 400 "," 401 "," 403 "," 404 "," 500 ");
 
     public LogReaderService(PrometheusMeterRegistry registry) {
+        //Initialisation des métriques, et création
         this.Erreur400 = Counter.builder("error_http_400")
                 .description("Erreur_400")
                 .register(registry);
@@ -40,6 +42,8 @@ public class LogReaderService {
     }
 
     public void readAndProcessErrorLogs(String logFilePath) {
+        //Lire les lignes déjà existant dans la page log
+        //nécessaire pour bien compter le nombre d'erreur survenu
         try {
             List<String> logLines = FileUtils.readLines(new File(logFilePath), StandardCharsets.UTF_8);
 
@@ -58,6 +62,7 @@ public class LogReaderService {
         //recupere les erreur déja dans le fichier log.
         readAndProcessErrorLogs(logFilePath);
 
+        //vision en temps réel du changement du fichier et analyse des nouvelles lignes
         File logFile = new File(logFilePath);
         TailerListenerAdapter listener = new TailerListenerAdapter() {
             @Override
@@ -70,6 +75,7 @@ public class LogReaderService {
             }
         };
 
+        // tailer c'est pour voir en temps réel le changement ou modification du fichier
         Tailer tailer = Tailer.create(logFile, listener, 1000, true);
         System.out.println("En attente de modifications dans le fichier de logs...");
 
@@ -81,6 +87,7 @@ public class LogReaderService {
     }
 
     private boolean containsError(String logLine, String errorStatus) {
+        //fonction qui teste l'existence du String errorStatus dans la ligne logLine
         return logLine.toLowerCase().contains(errorStatus);
     }
 
@@ -91,6 +98,7 @@ public class LogReaderService {
         }
         if(errorStatus.equals(" 401 ")){
             this.Erreur401.increment();
+            //debug manuelle
             System.out.println("Erreur detecté: " + errorLogLine);
         }
         if(errorStatus.equals(" 400 ")){
